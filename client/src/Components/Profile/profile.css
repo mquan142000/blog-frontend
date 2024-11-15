@@ -1,0 +1,78 @@
+/* Profile section */
+.profile-container {
+    min-width: 500px;
+    color: #f17e6c;
+    margin: auto;
+    justify-content: center;
+    border: 1px solid #f17e6c;
+    border-radius: 10px;
+    padding: 2rem 2rem;
+    margin-left: 20rem;
+    margin-right: 60rem;
+    margin-top: 10rem;
+  }
+  
+  .profile-container .profile-details {
+    text-align: left;
+  }
+
+  .profile-details h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+
+  .profile-loc {
+    font-size: 18px;
+    color: #f17e6c;
+    margin-top: 10px;
+  }
+
+  .animated-btn {
+    border: 2px solid currentColor;
+    border-radius: 10px;
+    color: #F17E6C;
+    font-size: 15px;
+    font-weight: 500;
+    overflow: hidden;
+    padding: 10px 15px;
+    position: relative;
+    text-decoration: none;
+    transition: 0.2s transform ease-in-out;
+    will-change: transform;
+    z-index: 0;
+  }
+  
+  .animated-btn::after {
+    background-color: #F17E6C;
+    border-radius: 10px;
+    content: '';
+    display: block;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translate(-100%, 0) rotate(10deg);
+    transform-origin: top left;
+    transition: 0.3s transform ease-out;
+    will-change: transform;
+    z-index: -1;
+  }
+  
+  .animated-btn:hover::after {
+    transform: translate(0, 0);
+  }
+  
+  .animated-btn:hover {
+    border: 2px solid transparent;
+    color: #FFEFD5;
+    transform: scale(1.05);
+    will-change: transform;
+  }
+  
+
+  
+
+  
+  

@@ -1,0 +1,71 @@
+/* Container cho TopSect */
+.topsect-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #FFE4C4;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+/* Phần header chứa lời chào người dùng */
+.topsect-header {
+    display: flex;
+    align-items: center;
+}
+
+/* Lời chào người dùng */
+.user-greeting {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #F17E6C;
+}
+
+/* Phần chứa các hành động (Store và Shopping Cart) */
+.topsect-actions {
+    display: flex;
+    align-items: center;
+}
+
+/* Link Store */
+.store-link {
+    font-size: 1.2rem;
+    color: #F17E6C;
+    margin-right: 20px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.store-link:hover {
+    color: #fff;
+}
+
+/* Icon giỏ hàng */
+.cart-icon {
+    font-size: 1.8rem;
+    color: #F17E6C;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.cart-icon:hover {
+    color: #fff;
+}
+
+/* Hiển thị số lượng trong giỏ hàng */
+.cart-size {
+    font-size: 1rem;
+    color: white;
+}
+
+/* Hiển thị token (nếu cần thiết) */
+.token-display {
+    font-size: 0.9rem;
+    color: white;
+    margin-top: 10px;
+}
