@@ -1,6 +1,4 @@
 import './App.css'
-import Product from './Components/Product/Product'
-// import Home from './Components/Home/Home'
 import Login from './Components/Login/Login'
 import Register from './Components/Register/Register'
 
@@ -12,6 +10,7 @@ import {
 import TopSect from './Components/TopSect/TopSect'
 import Home from "./Components/Home/Home.jsx";
 import Profile from "./Components/Profile/Profile.jsx";
+import Settings from "./Components/Setting/Settings.jsx";
 
 const router = createBrowserRouter([
   {
@@ -23,20 +22,16 @@ const router = createBrowserRouter([
     element: <div><Register/></div>
   },
   {
-    path: '/product',
-    element: <div><Product/></div>
-  },
-  {
-    path: '/topsect',
-    element: <div><TopSect/></div>
-  },
-  {
-    path: '/category',
+    path: '/home',
     element: <div><Home/></div>
   },
   {
     path: '/profile',
     element: <div><Profile/></div>
+  },
+  {
+    path: '/settings',
+    element: <div><Settings/></div>
   },
 
 ])

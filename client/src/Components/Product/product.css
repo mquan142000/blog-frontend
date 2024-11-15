@@ -34,7 +34,7 @@
 .card-image img {
     width: 100%;
     height: 250px; /* Tăng chiều cao ảnh để phù hợp với thẻ lớn hơn */
-    object-fit: contain;
+    object-fit: fill;
 }
 
 .card-info {
