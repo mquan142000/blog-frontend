@@ -20,7 +20,7 @@ const Register = () => {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        Axios.post('http://localhost:8080/api/auth/register', {
+        Axios.post('http://localhost:8089/api/auth/register', {
             username: userName,
             password: password
         })

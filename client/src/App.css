@@ -115,7 +115,7 @@ video {
   margin: auto;
   justify-content: space-between;
   border-radius: 10px;
-  background-color: hsl(0, 0%, 91%);
+  /* background-color: hsl(0, 0%, 91%); */
 }
 .loginPage .container .videoDiv, .registerPage .container .videoDiv {
   position: relative;

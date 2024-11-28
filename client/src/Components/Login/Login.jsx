@@ -30,9 +30,13 @@ const Login = () => {
 
             if (response.data && response.data.token) {
                 const token = response.data.token;
-                
+                const customerId = response.data.customerId;  // Giả sử bạn nhận được customerId từ phản hồi
+
                 // Lưu token vào localStorage
                 localStorage.setItem('token', token);
+
+                // Lưu customerId vào localStorage
+                localStorage.setItem('customerId', customerId);
 
                 // Giải mã token (jwt) và lấy thông tin tên từ payload
                 const decodedToken = JSON.parse(atob(token.split('.')[1]));  // Giải mã phần payload của token

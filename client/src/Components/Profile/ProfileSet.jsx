@@ -1,106 +1,213 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import SideBar from '../SideBar/SideBar.jsx';
-import { RxPerson } from 'react-icons/rx';
+import { getCustomerById, updateCustomers } from '../../API/index.jsx';
 
 const ProfileSet = () => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const storedFirstName = localStorage.getItem('firstName');
-    const storedLastName = localStorage.getItem('lastName');
-    const storedEmail = localStorage.getItem('email');
-
-    setFirstName(storedFirstName || searchParams.get('firstName') || '');
-    setLastName(storedLastName || searchParams.get('lastName') || '');
-    setEmail(storedEmail || searchParams.get('email') || '');
-  }, [location]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const searchParams = new URLSearchParams();
-    searchParams.set('firstName', firstName);
-    searchParams.set('lastName', lastName);
-    searchParams.set('email', email);
-
-    localStorage.setItem('firstName', firstName);
-    localStorage.setItem('lastName', lastName);
-    localStorage.setItem('email', email);
-
-    navigate({
-      pathname: '/profile',
-      search: `?${searchParams.toString()}`,
+    const [state, setState] = useState({
+        customer: null,
+        loading: true,
+        error: null,
     });
-  };
 
-  return (
-    <>
-      <SideBar />
-      <form className="container mx-auto flex flex-col justify-center px-32 mb-20" onSubmit={handleSubmit}>
-        <div className="flex flex-col justify-center mb-5 mt-8 gap-y-4">
-          <div className="mx-auto flex flex-col items-center gap-2 overflow-hidden">
-            <div className="w-[10rem] h-[10rem] overflow-hidden bg-[#efeeee] rounded-full relative flex items-end justify-center">
-              <RxPerson className="w-[80%] h-[80%] text-[gray]/[0.5]" />
-            </div>
-            <p>Update your profile</p>
-          </div>
-          <div className="flex md:gap-x-4 md:justify-around gap-y-9 md:gap-y-0 lg:justify-around gap-x-4 flex-col sm:flex-row ml-[4%] w-[80%] sm:full md:w-[90%]">
-            <div>
-              <label htmlFor="firstName" className="font-[500] mb-2 ml-1">
-                First Name
-              </label>
-              <div className="w-[24rem]">
-                <input
-                  className="border-none focus:outline-none text-sm pl-2 lg:pl-4 md:pl-4 h-12 w-[100%] bg-[#efeeee]/[0.5] border-transparent rounded-lg"
-                  type="text"
-                  placeholder="Enter your First Name"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="lastName" className="font-[500] mb-2 ml-1">
-                Last Name
-              </label>
-              <div className="md:w-[100%] w-[100%] lg:w-[24rem]">
-                <input
-                  className="border-none focus:outline-none text-sm pl-6 h-12 w-[100%] bg-[#efeeee]/[0.5] border-transparent rounded-lg"
-                  type="text"
-                  placeholder="Enter your Last Name"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-col justify-center md:items-center mb-10 mt-8">
-          <label htmlFor="email" className="font-[500] mb-1">
-            Email Address
-          </label>
-          <div className="lg:w-[32rem] text-center">
-            <input
-              className="border-none focus:outline-none text-sm pl-6 h-12 w-[80%] bg-[#efeeee]/[0.5] border-transparent rounded-lg"
-              type="email"
-              placeholder="sample@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-        </div>
-        <button type="submit" className="animated-btn px-[6rem] mx-auto py-[0.9rem] bg-brandColor text-white rounded-[5px] flex">
-          Apply profile settings
-        </button>
-      </form>
-    </>
-  );
+    const [editMode, setEditMode] = useState(false); // Chế độ chỉnh sửa
+    const [formData, setFormData] = useState({
+        name: '',
+        username: '',
+        phone: '',
+        email: '',
+        address: '',
+    });
+
+    // Lấy thông tin khách hàng từ API
+    useEffect(() => {
+        const customerId = localStorage.getItem('customerId');
+
+        if (!customerId) {
+            setState({
+                customer: null,
+                loading: false,
+                error: 'Customer ID not found in localStorage.',
+            });
+            return;
+        }
+
+        const fetchCustomerData = async () => {
+            try {
+                const data = await getCustomerById(customerId);
+                setState({
+                    customer: data,
+                    loading: false,
+                    error: null,
+                });
+
+                // Gán dữ liệu ban đầu vào form
+                setFormData({
+                    name: data.name,
+                    username: data.username,
+                    phone: data.phone,
+                    email: data.email,
+                    address: data.address,
+                });
+            } catch (err) {
+                console.error('Failed to fetch customer:', err);
+                setState({
+                    customer: null,
+                    loading: false,
+                    error: 'Unable to fetch profile data. Please try again later.',
+                });
+            }
+        };
+
+        fetchCustomerData();
+    }, []);
+
+    // Hàm xử lý thay đổi dữ liệu trong form
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    // Hàm cập nhật thông tin khách hàng
+    const handleUpdateProfile = async () => {
+        const customerId = localStorage.getItem('customerId');
+        if (!customerId) {
+            alert('Customer ID is missing.');
+            return;
+        }
+
+        try {
+            // Gọi API để cập nhật thông tin khách hàng
+            const updatedData = await updateCustomers(customerId, formData);
+            setState((prevState) => ({
+                ...prevState,
+                customer: updatedData,
+            }));
+            setEditMode(false); // Thoát chế độ chỉnh sửa
+            alert('Profile updated successfully!');
+        } catch (err) {
+            console.error('Failed to update profile:', err);
+            alert('Error updating profile. Please try again.');
+        }
+    };
+
+    const { customer, loading, error } = state;
+
+    return (
+        <>
+            <SideBar />
+            <section className="profile-container">
+                <div className="profile-details">
+                    <h1 className="text-xl font-bold mb-4">Your Profile</h1>
+                    {loading ? (
+                        <p>Loading...</p>
+                    ) : error ? (
+                        <p className="error-message text-red-500">{error}</p>
+                    ) : (
+                        <>
+                            <div className="profile-image mb-4">
+                                {customer.imageUrl ? (
+                                    <img
+                                        src={`http://localhost:8089${customer.imageUrl}`}
+                                        alt="Profile"
+                                        className="profile-picture rounded-full w-32 h-32 object-cover"
+                                    />
+                                ) : (
+                                    <div className="placeholder-image rounded-full w-32 h-32 bg-gray-300 flex items-center justify-center">
+                                        No Image
+                                    </div>
+                                )}
+                            </div>
+                            {editMode ? (
+                                <div className="edit-form">
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleInputChange}
+                                        placeholder="Name"
+                                        className="form-input"
+                                    />
+                                    <input
+                                        type="text"
+                                        name="username"
+                                        value={formData.username}
+                                        onChange={handleInputChange}
+                                        placeholder="Username"
+                                        className="form-input"
+                                    />
+                                    <input
+                                        type="text"
+                                        name="phone"
+                                        value={formData.phone}
+                                        onChange={handleInputChange}
+                                        placeholder="Phone"
+                                        className="form-input"
+                                    />
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        placeholder="Email"
+                                        className="form-input"
+                                    />
+                                    <input
+                                        type="text"
+                                        name="address"
+                                        value={formData.address}
+                                        onChange={handleInputChange}
+                                        placeholder="Address"
+                                        className="form-input"
+                                    />
+                                    <button
+                                        onClick={handleUpdateProfile}
+                                        className="animated-btn mt-6 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                    >
+                                        Save
+                                    </button>
+                                    <button
+                                        onClick={() => setEditMode(false)}
+                                        className="animated-btn mt-6 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 ml-4"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <p className="profile-loc">
+                                        <strong>Name:</strong> {customer.name}
+                                    </p>
+                                    <p className="profile-loc">
+                                        <strong>Username:</strong> {customer.username}
+                                    </p>
+                                    <p className="profile-loc">
+                                        <strong>Phone:</strong> {customer.phone}
+                                    </p>
+                                    <p className="profile-loc">
+                                        <strong>Email:</strong> {customer.email}
+                                    </p>
+                                    <p className="profile-loc">
+                                        <strong>Address:</strong> {customer.address}
+                                    </p>
+                                    <p className="profile-loc">
+                                        <strong>Member Since:</strong>{' '}
+                                        {new Date(customer.createdDate).toLocaleDateString()}
+                                    </p>
+                                    <button
+                                        onClick={() => setEditMode(true)}
+                                        className="animated-btn mt-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                    >
+                                        Edit Profile
+                                    </button>
+                                </>
+                            )}
+                        </>
+                    )}
+                </div>
+            </section>
+        </>
+    );
 };
 
 export default ProfileSet;
